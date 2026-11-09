@@ -1,0 +1,1619 @@
+@extends('admin/adminMaster')
+
+@section('adminpanel')
+    <div class="wrapper">
+        <main role="main" class="main-content">
+            <div class="container-fluid">
+
+                <div class="row justify-content-center">
+                    <div class="col-12">
+
+                        <div class="row">
+                            <div class="col-6">
+                              <h2 class="page-title">Add Model Exam </h2>
+                            </div>
+                            <div class="col-6 text-right">
+                                <a href="/addpercentagewisemodelexams-Form" class="btn btn-primary custom-btn-height">create A PERCENTAGE-BASED MODEL EXAM.</a>
+                            </div>
+                          </div>
+
+                          <style>
+                            .custom-btn-height {
+                              height: 30px;
+                            }
+                          
+                          </style>
+                          
+                          
+                              
+                          
+                          
+
+                        <form action="{{ url('addModel-Exam') }}" onsubmit="return mainValidation();" id="mform" method="POST">
+                            @csrf
+                            <input type="hidden" id="user_id" name="user_id" value="{{ session('user_id') }}">
+                            <div class="card shadow mb-4">
+                                @if (session('success'))
+                                    <h6 class="alert alert-success" id="alert"><button type="button" class="close" data-dismiss="alert">x</button>{{ session('success') }}</h6>
+                                @endif
+                                @if (session('error'))
+                                    <h6 class="alert alert-danger" id="alert"><button type="button" class="close" data-dismiss="alert">x</button>{{ session('error') }}</h6>
+                                @endif
+                                <div class="card-body">
+                                     <div id="TotalAddedQuestionAboveCount" style="color: rgb(11, 155, 11); font-weight: bold; text-align: right;"></div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group mb-3">
+                                                <label for="simpleinput"><b style="color: black;">Exam Name</b></label>
+                                                <input type="text" id="modelexamName" name="modelexamName" value="{{old('modelexamName')}}" onkeyup="return nameValidation()" placeholder="Enter exam name" class="form-control">
+                                                @if ($errors->has('modelexamName'))
+                                                    <span class="text-danger">{{ $errors->first('modelexamName') }}</span>
+                                                @endif
+                                                <span id="modelexamName-error" class="text-danger"></span>
+                                            </div>
+                                            <div class="form-group mb-3">
+                                                <label for="simpleinput"><b style="color: black;">Exam Description</b></label>
+                                                <textarea  id="modelexamDesc" name="modelexamDesc" placeholder="Exam Descriptions" value="{{old('modelexamDesc')}}"  onkeyup="return dateValidation();" rows="4" cols="50" style="flex-wrap: wrap;" class="form-control" ></textarea>
+                                                @if ($errors->has('modelexamDesc'))
+                                                    <span class="text-danger">{{ $errors->first('modelexamDesc') }}</span>
+                                                @endif
+                                                <span id="modelexamDesc-error" class="text-danger"></span>
+                                            </div>
+                                        </div>
+                                       
+                                        
+
+                                    </div>
+                                    <div class="row">
+                                        
+                                        <div class="col-md-3 mb-1">
+                                            <div class="form-group">
+                                                <label for="dailyexampostiveMark"><b style="color: black;">Positive Mark:</b></label>
+                                                <input type="text" id="dailyexampostiveMark" name="dailyexampostiveMark" value="{{ old('dailyexampostiveMark') }}" onkeyup="return postValidation()" placeholder="Enter positive mark" class="form-control">
+                                                @if ($errors->has('dailyexampostiveMark'))
+                                                    <span class="text-danger">{{ $errors->first('dailyexampostiveMark') }}</span>
+                                                @endif
+                                                <span id="dailyexampostiveMark-error" class="text-danger"></span>
+                                            </div>
+                                        </div>
+                                    
+                                       
+                                        <div class="col-md-3 mb-1">
+                                            <div class="form-group">
+                                                <label for="dailyexamnegativeMark"><b style="color: black;">Negative Mark:</b></label>
+                                                <input type="text" id="dailyexamnegativeMark" name="dailyexamnegativeMark" value="{{ old('dailyexamnegativeMark') }}" onkeyup="return negativeValidation()" placeholder="Enter negative mark" class="form-control">
+                                                @if ($errors->has('dailyexamnegativeMark'))
+                                                    <span class="text-danger">{{ $errors->first('dailyexamnegativeMark') }}</span>
+                                                @endif
+                                                <span id="dailyexamnegativeMark-error" class="text-danger"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+
+
+
+
+
+
+                                    @if(isset($module))
+                                    <div class="col-md-12">
+                                        <div class="form-group mb-3">
+                                            <label for="simpleinput"><b style="color: black;">Modules</b></label>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    @php
+                                                        $halfCount = ceil(count($module) / 2);
+                                                    @endphp
+                                                    @foreach($module as $index => $item)
+                                                        @if($index < $halfCount)
+                                                            <div class="form-check">
+                                                                <input type="checkbox" id="moduleId_{{$item->mId}}" value="{{$item->mId}}" name="moduleId[]" onclick="checkboxSubmoduleValidation();checkboxValidation()" class="form-check-input">
+                                                                <label for="moduleId_{{$item->mId}}" class="form-check-label">{{$item->mName}}</label>
+                                                            </div>
+                                                        @endif
+                                                    @endforeach
+                                                    @if ($errors->has('moduleId'))
+                                                        <span class="text-danger">{{ $errors->first('moduleId') }}</span>
+                                                    @endif
+                                                    <span id="moduleId-error" class="text-danger"></span>
+                                                </div>
+                                    
+                                                <div class="col-md-6">
+                                                    @foreach($module as $index => $item)
+                                                        @if($index >= $halfCount)
+                                                            <div class="form-check">
+                                                                <input type="checkbox" id="moduleId_{{$item->mId}}" value="{{$item->mId}}" name="moduleId[]" onclick="checkboxSubmoduleValidation();checkboxValidation();" class="form-check-input">
+                                                                <label for="moduleId_{{$item->mId}}" class="form-check-label">{{$item->mName}}</label>
+                                                            </div>
+                                                        @endif
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @endif
+
+                                    {{-- submodule --}}
+                                     {{-- the main div closing the submodule --}}
+                            <div id="mainsubmodulediv"style="display: none;"> 
+                                <div class="col-md-12">
+                                    <div class="form-group mb-3">
+                                            <label for="simpleinput"><b style="color: black;">Sub Modules</b></label>
+                                        <div class="form-group mb-6">
+                                            <div class="row">
+                                                
+                                               
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                  &nbsp;&nbsp;&nbsp;<div id="submodulesDiv1" style="display: none;">
+                                                        <!-- Display the submodules checkboxes -->
+                                                    </div>&nbsp;&nbsp;
+                                                    <div id="submodulesDiv2" style="display: none;">
+                                                        <!-- Display the submodules checkboxes -->
+                                                    </div>
+                                            </div>
+                                                    <span id="submodule__Id-error" class="text-danger"></span>                                        
+                                           
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+               {{-- END the main div closing the submodule --}}
+              
+             
+           
+           
+            <script>
+                var uniqueSubmoduleIds = new Set(); // Keep track of unique submodule IDs
+                var checkedSubmoduleIds = []; // Declare the variable in the outer scope
+            
+                function checkboxSubmoduleValidation() {
+                    var selectedModules = [];
+            
+                    $('input[name="moduleId[]"]:checked').each(function () {
+                        selectedModules.push($(this).val());
+                    });
+                   // console.log('selectedModules:',selectedModules);
+            
+                    // Clear submodule-related data if no modules are selected
+                    if (selectedModules.length === 0) {
+                        clearSubmodules();
+                        return;
+                    }
+            
+                    // Modules that were selected previously but are not selected now
+                    var modulesToRemove = checkedSubmoduleIds.filter(submoduleId => !selectedModules.includes(submoduleId.split('_')[0]));
+            
+                    // Remove submodules for modules that are no longer selected
+                    removeSubmodules(modulesToRemove);
+            
+                    // Load submodules for newly selected modules
+                    loadSubmodules(selectedModules);
+                }
+            
+                function removeSubmodules(modulesToRemove) {
+                    modulesToRemove.forEach(function (submoduleId) {
+                        // Remove submodule HTML elements for the specified module
+                        $('#submodulesDiv1 input[data-submodule="' + submoduleId + '"]').closest('.form-check').remove();
+                        $('#submodulesDiv2 input[data-submodule="' + submoduleId + '"]').closest('.form-check').remove();
+            
+                        // Remove the submodule from the checkedSubmoduleIds array
+                        checkedSubmoduleIds = checkedSubmoduleIds.filter(submodule => submodule !== submoduleId);
+                    });
+                }
+            
+                function clearSubmodules() {
+                    // Remove all submodule HTML elements
+                    $('#submodulesDiv1').empty();
+                    $('#submodulesDiv2').empty();
+                    document.getElementById("mainsubmodulediv").style.display = 'none';
+                    
+                    //clear the questions toooo
+                    $('#questDiv1').empty();
+                    $('#questDiv2').empty();
+                    document.getElementById("mainQUESTdiv").style.display = 'none';
+            
+                    // Clear the checkedSubmoduleIds array
+                    checkedSubmoduleIds = [];
+                }
+            
+                function loadSubmodules(moduleIds) {
+                    moduleIds.forEach(function (moduleId) {
+                        $.ajax({
+                            url: "{{url('/ChapterWisemodelexmmodulecheck')}}",
+                            type: "POST",
+                            data: {
+                                mId: moduleId,
+                                _token: '{{csrf_token()}}'
+                            },
+                            success: function (result) {
+                                if (result) {
+                                    $.each(result, function (key, value) {
+                                        var submoduleId = moduleId + '_' + value.smId;
+            
+                                        // Check if the submodule ID is unique before adding to HTML
+                                        if (!checkedSubmoduleIds.includes(submoduleId)) {
+                                            checkedSubmoduleIds.push(submoduleId);
+            
+                                            // Determine the appropriate div based on the key
+                                            var submoduleDiv = (key % 2 === 0) ? '#submodulesDiv1' : '#submodulesDiv2';
+            
+                                            // Append the submodule HTML to the selected div
+                                            $(submoduleDiv).append('<div class="form-check">'
+                                                + '<input type="checkbox" id="submoduleId_' + submoduleId + '" value="' + submoduleId + '" name="submoduleId[]" data-submodule="' + submoduleId + '" class="form-check-input" onclick="checkboxValidation();checkboxQuestionValidation();">'
+                                                + '<label for="submoduleId_' + submoduleId + '" class="form-check-label">' + value.smName + '</label>'
+                                                + '</div>');
+                                        }
+                                    });
+            
+                                   // console.log("Checked Submodule IDs:", checkedSubmoduleIds);
+                                }
+                            },
+                            complete: function () {
+                                // Show/hide elements as needed
+                                $('#submodulesDiv1').show();
+                                $('#submodulesDiv2').show();
+                                document.getElementById("mainsubmodulediv").style.display = 'block';
+                            }
+                        });
+                    });
+                }
+            
+                // Function to handle checkbox validation when a submodule checkbox is unchecked
+                function checkboxValidation() {
+                    // Clear the checkedSubmoduleIds array
+                    checkedSubmoduleIds = [];
+            
+                    // Iterate over all submodule checkboxes
+                    $('input[name="submoduleId[]"]').each(function () {
+                        var submoduleCheckbox = $(this);
+                        var submoduleId = submoduleCheckbox.val();
+            
+                        // If the checkbox is checked, add it to the checkedSubmoduleIds array
+                        if (submoduleCheckbox.is(':checked')) {
+                            checkedSubmoduleIds.push(submoduleId);
+                        }
+                    });
+            
+                  //  console.log("Checked Submodule IDs:", checkedSubmoduleIds);
+                }
+            </script>
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+               
+           
+         
+            
+            
+            
+            
+            
+            
+              
+            
+            
+            
+                                    {{-- end submodule --}}
+
+              {{-- the main div closing the question --}}
+                            <div id="mainQUESTdiv"style="display: none;"> 
+                                <div class="col-md-12">
+                                    <div class="form-group mb-3">
+                                            <label for="simpleinput"><b style="color: black;">Questions</b></label>
+                                            <div id="checkedQuestionCount" style="color: brown; font-weight: bold; text-align: right;"></div>
+                                            <div id="TotalAddedQuestionCount" style="color: brown; font-weight: bold; text-align: right;"></div><br>
+                                            <div style="color: rgb(8, 7, 8); font-weight: bold; text-align: right;"><input type="button" class="btn mb-2 btn-primary" style="background-color: rgb(122, 8, 8);" value="+add" onclick="storeCheckedQuestions()" >&nbsp;&nbsp;
+                                                <input type="button" class="btn mb-2 btn-primary" style="background-color: blue;" value="view&save" onclick="viewCheckedQuestions()" ></div>
+                                                
+                                                 <script>
+                                                   
+                                                    var addedQuestions = [];
+                                                
+                                                    function storeCheckedQuestions() {
+                                                        var checkedCheckboxes = document.querySelectorAll('input[name="questionId[]"]:checked');
+                                                        var checkedValues = [];
+                                                        
+                                                        if (checkedCheckboxes.length === 0) {
+                                                            alert('Please select at least one question.');
+                                                            return; // Stop further execution
+                                                        }
+                                                
+                                                        checkedCheckboxes.forEach(function (checkbox) {
+                                                            var value = checkbox.value;
+                                                            if (!addedQuestions.includes(value)) {
+                                                                addedQuestions.push(value);
+                                                            }
+                                                            checkedValues.push(value);
+                                                        });
+                                                        
+                                                        var totalAddedQuestionCount = addedQuestions.length;
+                                                        $('#TotalAddedQuestionCount').text('Total Added Count: ' + totalAddedQuestionCount);
+                                                        $('#TotalAddedQuestionAboveCount').text('Total Added Count: ' + totalAddedQuestionCount);
+                                                
+                                                        // Display 
+                                                        alert('Selected questions are added.');
+                                                
+                                                        
+                                                       // console.log('Checked Values:', checkedValues);
+                                                    }
+                                                
+                                                    function viewCheckedQuestions() {
+                                                        var ExamName= document.getElementById('modelexamName').value;
+                                                        var ExamDesc= document.getElementById('modelexamDesc').value;
+                                                        var ExamPost= document.getElementById('dailyexampostiveMark').value;
+                                                        var ExamNega= document.getElementById('dailyexamnegativeMark').value;
+                                                        var modalExamName = document.getElementById('modalExamName');
+                                                        var modalDesc = document.getElementById('modalDesc');
+                                                        var modalpost = document.getElementById('modalpost');
+                                                        var modalnegat = document.getElementById('modalnegat');
+
+                                                        if(ExamName==""){
+                                                            alert("Please enter exam name");
+                                                            return false;
+                                                        }
+                                                        if(ExamDesc==""){
+                                                            alert("Please enter description");
+                                                            return false;
+                                                        }
+                                                        if(ExamPost==""){
+                                                            alert("Please add positive mark");
+                                                            return false;
+                                                        }
+                                                        if(ExamNega==""){
+                                                            alert("Please add negative mark");
+                                                            return false;
+                                                        }
+
+                                                        var modalList = document.getElementById('modalList');
+                                                        modalList.innerHTML = ''; // Clear previous content
+                                                       // console.log(addedQuestions);
+                                                        $.ajax({
+                                                            url: "{{url('/addedQuestionsINmOdelExam')}}",
+                                                            type: "get",
+                                                            data: {
+                                                                qId: addedQuestions.join(','),
+                                                                _token: '{{csrf_token()}}'
+                                                            },
+                                                            success: function (response) {
+                                                                if (response && Array.isArray(response.questions)) {
+                                                                    var questions = response.questions;
+                                                                   // console.log('questions', questions);
+                                                                    if (questions.length > 0) {
+                                                                        questions.forEach(function (question, index) {
+                                                                            var listItem = document.createElement('li');
+                                                                            // Display the serial number and the question
+                                                                            listItem.textContent = (index + 1) + '. ' + question.question;
+                                                                            modalList.appendChild(listItem);
+                                                                        });
+                                                                    } else {
+                                                                        alert('There are no questions.');
+                                                                    }
+                                                                } else {
+                                                                    alert('Invalid response from the server.');
+                                                                }
+
+                                                                modalExamName.textContent = ExamName;
+                                                                modalDesc.textContent = ExamDesc;
+                                                                modalpost.textContent = ExamPost;
+                                                                modalnegat.textContent = ExamNega;
+                                                            }
+                                                        });
+
+
+
+                                                
+                                                        var modal = document.getElementById('myModal');
+                                                        modal.style.display = 'block';
+                                                    }
+                                                
+                                                    function closeModal() {
+                                                        var modal = document.getElementById('myModal');
+                                                        modal.style.display = 'none';
+                                                    }
+                                                
+                                                    // Close the modal if the user clicks outside of it
+                                                    window.onclick = function (event) {
+                                                        var modal = document.getElementById('myModal');
+                                                        if (event.target == modal) {
+                                                            modal.style.display = 'none';
+                                                        }
+                                                    };
+
+
+                                                    function confirmAndaddForm() {
+                                                        event.preventDefault();
+                                                        var ExamName= document.getElementById('modelexamName').value;
+                                                        var ExamDesc= document.getElementById('modelexamDesc').value;
+                                                        var ExamPost= document.getElementById('dailyexampostiveMark').value;
+                                                        var ExamNega= document.getElementById('dailyexamnegativeMark').value;
+                                                        if(ExamName==""){
+                                                            alert("Please enter exam name");
+                                                            return false;
+                                                        }
+                                                        if(ExamDesc==""){
+                                                            alert("Please enter description");
+                                                            return false;
+                                                        }
+                                                        if(ExamPost==""){
+                                                            alert("Please add positive mark");
+                                                            return false;
+                                                        }
+                                                        if(ExamNega==""){
+                                                            alert("Please add negative mark");
+                                                            return false;
+                                                        }
+                                                        // console.log('ExamName',ExamName);
+                                                        // console.log('ExamDesc',ExamDesc);
+                                                        // console.log('ExamPost',ExamPost);
+                                                        // console.log('ExamNega',ExamNega);
+                                                        // console.log('addedQuestions',addedQuestions);
+                                                        
+                                                        $.ajax({
+                                                            type: 'POST',
+                                                            url: '/ModelExamArrayQuestinonInserting',
+                                                            // data: formData,
+                                                            data: {
+                                                                ExamName: ExamName,
+                                                                ExamDesc: ExamDesc,
+                                                                ExamPost: ExamPost,
+                                                                ExamNega: ExamNega,
+                                                                addedQuestions: addedQuestions,
+                                                                
+                                                            },
+                                                            headers: {
+                                                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                                            },
+                                                            success: function(response) {
+                                                                // console.log('Form submitted successfully. Response:', response);
+                                                                alert('Model exam added successfully.');
+                                                                location.reload();
+                                                               
+                                                            },
+                                                            error: function(xhr, status, error) {
+                                                                // console.error('Error during form submission:', error);
+                                                                // console.log(xhr.responseText);  // Log the response text for more details
+                                                                alert('Error during form submission. Please try again.');
+                                                                location.reload();
+                                                               
+                                                            }
+                                                        });
+                                                    }
+  
+                                                </script>
+                                                
+                                                
+
+                                        <div class="form-group mb-6">
+                                            <div class="row">
+                                                
+                                               
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                  &nbsp;&nbsp;&nbsp;<div id="questDiv1" style="display: none;">
+                                                        <!-- Display the submodules checkboxes -->
+                                                    </div>&nbsp;&nbsp;
+                                                    <div id="questDiv2" style="display: none;">
+                                                        <!-- Display the submodules checkboxes -->
+                                                    </div>
+                                            </div>
+                                                    <span id="quest__Id-error" class="text-danger"></span>                                        
+                                           
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            
+                            
+      <!--model for my model exam showing and saving-->
+            <!-- Modal HTML -->
+<div id="myModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()" style="color: rgb(126, 58, 53);  text-align: right;">&times;</span>
+      <label for="modalExamName" style="color: rgb(221, 14, 49, 0.945); font-weight: bold;">Exam Name:</label>
+      <p id="modalExamName" style="color: rgb(10, 82, 60); font-weight: bold; display: inline;"></p>
+      <label for="modalDesc" style="color: rgb(221, 14, 49, 0.945); font-weight: bold;">Description:</label>
+      <p id="modalDesc" style="color: rgb(10, 82, 60); font-weight: bold; display: inline;"></p>
+      <label for="modalpost" style="color: rgb(221, 14, 49, 0.945); font-weight: bold;">Positive Mark:</label>
+      <p id="modalpost" style="color: rgb(10, 82, 60); font-weight: bold; display: inline;"></p>
+      <label for="modalnegat" style="color: rgb(221, 14, 49, 0.945); font-weight: bold;">Negative Mark:</label>
+      <p id="modalnegat" style="color: rgb(10, 82, 60); font-weight: bold; display: inline;"></p>
+   
+      <p id="modalContent" style="color: rgba(221, 14, 49, 0.945); font-weight: bold; ">ADDED QUESTIONS</p>
+      <ul id="modalList" style="color: rgb(8, 7, 8); font-weight: bold; "></ul>
+      <div class="modal-footer">
+        <button type="button" class="btn mb-2 btn-secondary" style="text-align: left;" onclick="closeModal()">Close</button>
+        <input type="button" class="btn mb-2 btn-primary" style="text-align: left;" value="Save" onclick="confirmAndaddForm()">
+
+    </div>
+    </div>
+    
+  </div>
+
+
+
+
+
+  <style>
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+    }
+  
+    .modal-content {
+      background-color: #fefefe;
+      margin: 0% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 60%;
+      max-width: 600px;
+      position: relative;
+    }
+  
+    .close {
+      color: #aaa;
+      float: left;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  
+    .close:hover,
+    .close:focus {
+      color: black;
+    }
+  
+   
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+  
+    li {
+      margin-bottom: 10px;
+    }
+  </style>
+                            
+                            
+     <!--end model exam showing popup close-->
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+               {{-- END the main div closing the submodule --}}
+                    <style>
+                        /* Add this CSS to your stylesheet */
+                    .checkbox-right {
+                        text-align: right;
+                    }
+                    .checkbox-right .form-check {
+                        text-align: left;
+                        display: inline-block;
+                        margin-right: 20px; /* Adjust the margin as needed */
+                    }
+                    </style>                                    
+ 
+           
+
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+    var selectedSubmodules = []; // Keep track of selected submodules
+
+    function checkboxQuestionValidation() {
+        var newlySelectedSubmodules = [];
+
+        // $('input[name="submoduleId[]"]:checked').each(function () {
+        //     var submoduleParts = $(this).val().split('_');
+        //     var numericalId = submoduleParts.length === 2 ? submoduleParts[1] : null;
+      
+        //     if (numericalId !== null) {
+        //         newlySelectedSubmodules.push({
+        //             id: numericalId,
+        //             smName: $('label[for="submoduleId_' + numericalId + '"]').text()
+        //         });
+        //     }
+        // });
+        $('input[name="submoduleId[]"]:checked').each(function () {
+        var submoduleParts = $(this).val().split('_');
+        var numericalId = submoduleParts.length === 2 ? submoduleParts[1] : null;
+        var smNameid = $(this).val();
+
+            if (numericalId !== null) {
+                var labelForId = 'submoduleId_' + smNameid;
+                var labelElement = $('label[for="' + labelForId + '"]');
+              //  console.log("numericalId:", numericalId, "labelElement:", labelElement);
+
+                var smName = labelElement.text();
+                //console.log("smName:", smName);
+
+                newlySelectedSubmodules.push({
+                    id: numericalId,
+                    smName: smName
+                });
+            }
+        });
+
+       // console.log("newlySelectedSubmodules:", newlySelectedSubmodules);
+       
+
+        var submodulesToLoad = newlySelectedSubmodules.filter(submodule => !selectedSubmodules.some(s => s.id === submodule.id));
+        var submodulesToClear = selectedSubmodules.filter(submodule => !newlySelectedSubmodules.some(s => s.id === submodule.id));
+
+        // Clear questions for submodules that are unchecked
+        clearQuestions(submodulesToClear);
+
+        // Load questions for newly checked submodules
+        loadQuestions(submodulesToLoad);
+
+        // Update the selectedSubmodules list
+        selectedSubmodules = newlySelectedSubmodules;
+       // console.log('selectedSubmodules:',selectedSubmodules);
+       
+       updateCheckedQuestionCount();
+       
+    }
+
+    function clearQuestions(submodulesToClear) {
+        submodulesToClear.forEach(function (submodule) {
+            // Remove question HTML elements for the specified submodule
+            $('#questDiv1 input[data-submodule="' + submodule.id + '"]').closest('.form-check').remove();
+            $('#questDiv2 input[data-submodule="' + submodule.id + '"]').closest('.form-check').remove();
+            $('#questDiv1 label.submodule-label[data-submodule="' + submodule.id + '"]').remove();
+        });
+    }
+
+    function loadQuestions(submodulesToLoad) {
+        submodulesToLoad.forEach(function (submodule) {
+            $.ajax({
+                url: "{{url('/modelexmreturnquest')}}",
+                type: "get",
+                data: {
+                    smId: submodule.id,
+                    _token: '{{csrf_token()}}'
+                },
+                success: function (result) {
+                    if (result && result.length > 0) {
+                        var questionDiv = '#questDiv1';
+                        $(questionDiv).append('<label class="submodule-label" data-submodule="' + submodule.id + '" style="font-weight: bold; color: black;"><b>' + submodule.smName + '</b></label>');
+
+                        result.forEach(function (value) {
+                            $(questionDiv).append('<div class="form-check">'
+                                + '<input type="checkbox" id="questId_' + submodule.id + '_' + value.cqId + '" value="' + value.cqId + '" name="questionId[]" data-submodule="' + submodule.id + '" class="form-check-input" onclick="checkboxQuestionValidation();">'
+                                + '<label for="questId_' + submodule.id + '_' + value.cqId + '" class="form-check-label">' + value.question + '</label>'
+                                
+                                + '<abbr style="text-decoration: none;" title="Edit "><span style="text-decoration: none;color: #007bff;"><span class="fe fe-24 fe-edit" onclick="return updateForm(' + value.cqId +')"></span></abbr>'
+
+                                
+                                
+                                + '</div>');
+                        });
+                    } else {
+                        alert('There are no questions in your selected submodule.');
+                    }
+                },
+                complete: function () {
+                    // Show/hide elements as needed
+                    $('#questDiv1').show();
+                    $('#questDiv2').show();
+                    document.getElementById("mainQUESTdiv").style.display = 'block';
+                }
+            });
+        });
+    }
+
+    
+     function updateCheckedQuestionCount() {
+        // Count the number of checked checkboxes
+        var checkedCount = $('input[name="questionId[]"]:checked').length;
+
+        // Display the count in a div
+        $('#checkedQuestionCount').text('Selected Questions Count: ' + checkedCount);
+    }
+   
+</script>
+
+
+
+             <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<!-- Add the Bootstrap script here -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+
+<div class="modal fade" id="edt_question" tabindex="-1" role="dialog" aria-labelledby="varyModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="varyModalLabel">EDIT QUESTION</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="/ModelExamquestionUpdate" method="post" id="yourFormId" >
+                    @csrf
+                    <meta name="csrf-token" content="{{ csrf_token() }}">
+                    
+                    <input type="text" style="width:450px" name="cqId" id="cqId" hidden>
+                    <input type="text" style="width:450px" name="qCode" id="qCode" hidden>
+                    <input type="text" style="width:450px" name="question_level" id="question_level" hidden>
+                    <input type="hidden" id="user_id" name="user_id" value="{{ session('user_id') }}">
+                    
+
+                    <div>
+                        <div id="show_modulename">
+                            <input type="text" style="width:450px" name="mId" id="mId" class="form-control" hidden><br>
+                            <label for="mname"><b style="color: black;">Module Name :</b> </label><br>
+                            <input type="text" style="width: 450px;" name="mName" id="mName" class="form-control" readonly>
+                            
+                        </div>
+                        
+                       
+                    </div>
+
+
+                    <meta name="viewport" content="width=device-width, initial-scale=1">
+                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+                    
+
+                    <div id="show_submodule">
+                        <input type="text" style="width:450px" name="smId" id="smId" hidden><br>
+                        <label for="smId"><b style="color: black;">Submodule Name :</b> </label>
+                        <input type="text" style="width: 450px;" name="smName" id="smName" class="form-control" readonly>
+                        
+                        <br>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label for="question" class="col-form-label"><b style="color: black;" >Enter Question :</b> </label><br>
+                        <textarea id="question1"  name="question" class="form-control" onkeyup="questionV();"></textarea>
+                    </div>
+                    <span class="text-danger" id="question-error"></span>
+                    <div class="form-group">
+                        <label for="option1" class="col-form-label"><b style="color: black;" >Enter Option 1 :</b> </label><br>
+                        <input type="radio" id="answer1" name="answer" value="option1" class="check-new">
+                        <textarea type="text" style="width:450px" name="option1" id="option1" class="form-control" onkeyup="option1V();"></textarea><br>
+                    </div>
+                    <span class="text-danger" id="option1-error"></span>
+                    <div class="form-group">
+                        <label for="option2" class="col-form-label"><b style="color: black;">Enter Option 2 :</b> </label><br>
+                        <input type="radio" id="answer2" name="answer" value="option2" class="check-new">
+                        <textarea type="text" style="width:450px" name="option2" id="option2" class="form-control" onkeyup="option2V();"></textarea><br>
+                    </div>
+                    <span class="text-danger" id="option2-error"></span>
+                    <div class="form-group">
+                        <label for="option3" class="col-form-label"><b style="color: black;">Enter Option 3 :</b> </label><br>
+                        <input type="radio" id="answer3" name="answer" value="option3" class="check-new">
+                        <textarea type="text" style="width:450px" name="option3" id="option3" class="form-control" onkeyup="option3V();"></textarea><br>
+                    </div>
+                    <span class="text-danger" id="option3-error"></span>
+                    <div class="form-group">
+                        <label for="option4" class="col-form-label"><b style="color: black;">Enter Option 4 :</b> </label><br>
+                        <input type="radio" id="answer4" name="answer" value="option4" class="check-new">
+                        <textarea type="text" style="width:450px" name="option4" id="option4" class="form-control" onkeyup="option4V();"></textarea><br>
+                    </div>
+                    <span class="text-danger" id="option4-error"></span>
+                    <div class="modal-footer">
+                        <button type="button" class="btn mb-2 btn-secondary" data-dismiss="modal">Close</button>
+                        {{-- <input type="submit" class="btn mb-2 btn-primary" value="Save" onclick="return submitForm();"> --}}
+                        <input type="submit" class="btn mb-2 btn-primary" value="Update" onclick="submitForm(); return false;">
+
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<script>
+    function questionV(){
+        var question = document.getElementById('question1').value;
+       // console.log(question);
+       
+        if(question==""){
+            
+            document.getElementById("question-error").innerHTML = "This field is required.";
+            return false;
+        } 
+        else{
+            document.getElementById("question-error").innerHTML = "";    
+        }
+             
+    }
+    function option4V(){
+       
+        var option4 = document.getElementById('option4').value;
+        if(option4==""){
+            
+            document.getElementById("option4-error").innerHTML = "This field is required.";
+            return false;
+        } 
+        else{
+            document.getElementById("option4-error").innerHTML = "";    
+        }
+    }
+    function option3V(){
+       
+        var option3 = document.getElementById('option3').value;
+        if(option3==""){
+            
+            document.getElementById("option3-error").innerHTML = "This field is required.";
+            return false;
+        } 
+        else{
+            document.getElementById("option3-error").innerHTML = "";    
+        }
+    }
+    function option2V(){
+       
+        var option2 = document.getElementById('option2').value;
+        if(option2==""){
+            
+            document.getElementById("option2-error").innerHTML = "This field is required.";
+            return false;
+        } 
+        else{
+            document.getElementById("option2-error").innerHTML = "";    
+        }
+    }
+    function option1V(){
+        var option1 = document.getElementById('option1').value;
+        if(option1==""){
+            
+            document.getElementById("option1-error").innerHTML = "This field is required.";
+            return false;
+        } 
+        else{
+            document.getElementById("option1-error").innerHTML = "";    
+        }
+    }
+</script>
+
+
+
+
+
+<script>
+    // Function to perform AJAX form submission
+    function submitForm() {
+          
+    
+        event.preventDefault();
+
+        // Serialize the form data
+        var formData = $('#yourFormId').serialize();
+        var question = $('#question1').val();
+        var option1 = $('#option1').val();
+        var option2 = $('#option2').val();
+        var option3 = $('#option3').val();
+        var option4 = $('#option4').val();
+        var answer = $('input[name="answer"]:checked').val(); // Assuming answer is a radio button
+        var cqId = $('#cqId').val();
+        var qCode = $('#qCode').val();
+        var mId = $('#mId').val();
+        var smId = $('#smId').val();
+        var question_level = $('#question_level').val();
+        var user_id = $('#user_id').val();
+        
+        
+         if(question==""){
+            
+            document.getElementById("question-error").innerHTML = "This field is required.";
+            return false;
+        } 
+        else{
+            document.getElementById("question-error").innerHTML = "";    
+        }
+        if(option1==""){
+            
+            document.getElementById("option1-error").innerHTML = "This field is required.";
+            return false;
+        } 
+        else{
+            document.getElementById("option1-error").innerHTML = "";    
+        }
+        if(option2==""){
+            
+            document.getElementById("option2-error").innerHTML = "This field is required.";
+            return false;
+        } 
+        else{
+            document.getElementById("option2-error").innerHTML = "";    
+        }
+        if(option3==""){
+            
+            document.getElementById("option3-error").innerHTML = "This field is required.";
+            return false;
+        } 
+        else{
+            document.getElementById("option3-error").innerHTML = "";    
+        }
+        if(option4==""){
+            
+            document.getElementById("option4-error").innerHTML = "This field is required.";
+            return false;
+        } 
+        else{
+            document.getElementById("option4-error").innerHTML = "";    
+        }
+        
+        
+        
+        
+
+        $.ajax({
+            type: 'POST',
+            url: '/ModelExamquestionUpdate',
+            // data: formData,
+            data: {
+                question: question,
+                option1: option1,
+                option2: option2,
+                option3: option3,
+                option4: option4,
+                cqId: cqId,
+                qCode: qCode,
+                answer: answer,
+                smId: smId,
+                question_level: question_level,
+                mId: mId,
+                user_id: user_id,
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(response) {
+               // console.log('Form submitted successfully. Response:', response);
+                alert('Form Updated successfully.');
+                $('#edt_question').modal('hide');
+                EditerQUESTION();
+            },
+            error: function(xhr, status, error) {
+               // console.error('Error during form submission:', error);
+               // console.log(xhr.responseText);  // Log the response text for more details
+                alert('Error during form submission. Please try again.');
+                $('#edt_question').modal('hide');
+            }
+        });
+    }
+
+    
+    function isUnitSelected() {
+       
+        return true;
+    }
+</script>
+
+<script>
+    function EditerQUESTION() {
+      //  console.log("EditerQUESTION load:");
+        var newlySelectedSubmodules1 = [];
+
+        $('input[name="submoduleId[]"]:checked').each(function () {
+            var submoduleParts = $(this).val().split('_');
+            var numericalId = submoduleParts.length === 2 ? submoduleParts[1] : null;
+            var smNameid = $(this).val();
+
+            if (numericalId !== null) {
+                var labelForId = 'submoduleId_' + smNameid;
+                var labelElement = $('label[for="' + labelForId + '"]');
+                var smName = labelElement.text();
+
+                newlySelectedSubmodules1.push({
+                    id: numericalId,
+                    smName: smName
+                });
+            }
+        });
+
+       // console.log("newlySelectedSubmodules1:", newlySelectedSubmodules1);
+
+        // Clear previous questions before loading new ones
+        clearQuestions1(selectedSubmodules);
+
+        // Load questions for newly checked submodules
+        loadQuestions1(newlySelectedSubmodules1);
+
+        // Update the selectedSubmodules list
+        selectedSubmodules = newlySelectedSubmodules1;
+        
+         updateCheckedQuestionCount();
+    }
+
+    function clearQuestions1(submodulesToClear) {
+        submodulesToClear.forEach(function (submodule) {
+            // Remove question HTML elements for the specified submodule
+            $('#questDiv1 input[data-submodule="' + submodule.id + '"]').closest('.form-check').remove();
+            $('#questDiv2 input[data-submodule="' + submodule.id + '"]').closest('.form-check').remove();
+            $('#questDiv1 label.submodule-label[data-submodule="' + submodule.id + '"]').remove();
+        });
+
+        // Empty the questDiv1 element
+        $('#questDiv1').empty();
+        // Empty the questDiv2 element (assuming it is also meant to be cleared)
+        $('#questDiv2').empty();
+    }
+
+    function loadQuestions1(newlySelectedSubmodules1) {
+       // console.log('load---newlySelectedSubmodules1', newlySelectedSubmodules1)
+
+        newlySelectedSubmodules1.forEach(function (submodule) {
+            $.ajax({
+                url: "{{url('/modelexmreturnquest')}}",
+                type: "get",
+                data: {
+                    smId: submodule.id,
+                    _token: '{{csrf_token()}}'
+                },
+                success: function (result) {
+                    if (result && result.length > 0) {
+                        var questionDiv = '#questDiv1';
+
+                        $(questionDiv).append('<label class="submodule-label" data-submodule="' + submodule.id + '" style="font-weight: bold; color: black;"><b>' + submodule.smName + '</b></label>');
+
+                        result.forEach(function (value) {
+                            $(questionDiv).append('<div class="form-check">'
+                                + '<input type="checkbox" id="questId_' + submodule.id + '_' + value.cqId + '" value="' + value.cqId + '" name="questionId[]" data-submodule="' + submodule.id + '" class="form-check-input" onclick="checkboxQuestionValidation();">'
+                                + '<label for="questId_' + submodule.id + '_' + value.cqId + '" class="form-check-label">' + value.question + '</label>'
+
+                                + '<abbr style="text-decoration: none;" title="Edit "><span style="text-decoration: none;color: #007bff;"><span class="fe fe-24 fe-edit" onclick="return updateForm(' + value.cqId +')"></span></abbr>'
+
+                                + '</div>');
+
+                        });
+                    } else {
+                        alert('There are no questions in your selected submodule.');
+                    }
+                },
+                complete: function () {
+                    // Show/hide elements as needed
+                    $('#questDiv1').show();
+                    $('#questDiv2').show();
+                    document.getElementById("mainQUESTdiv").style.display = 'block';
+                }
+            });
+        });
+    }
+</script>
+
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+    function updateForm(cqId) {
+  //  console.log("Updating form for cqId:", cqId);
+    $.ajax({
+        url: '/update_ModelExamQuestionForm/' + cqId,
+        type: 'GET',
+        data: {
+            cqId: cqId
+        },
+        dataType: 'json',
+        success: function(response, status, xhr) {
+           // console.log("Response:", response);
+
+            // Check if the response array has at least one item
+            if (Array.isArray(response) && response.length > 0) {
+                // Access the first item in the array
+                const responseData = response[0];
+
+                if (responseData && responseData.mName !== undefined) {
+                    document.getElementById('mName').value = responseData.mName;
+                    document.getElementById('smName').value = responseData.smName;
+                    document.getElementById('question1').value = responseData.question;
+                    document.getElementById('option1').value = responseData.optA;
+                    document.getElementById('option2').value = responseData.optB;
+                    document.getElementById('option3').value = responseData.optC;
+                    document.getElementById('option4').value = responseData.optD;
+
+                    document.getElementById('answer1').checked = responseData.ansA === "1";
+                    document.getElementById('answer2').checked = responseData.ansB === "1";
+                    document.getElementById('answer3').checked = responseData.ansC === "1";
+                    document.getElementById('answer4').checked = responseData.ansD === "1";
+
+                    document.getElementById('cqId').value = responseData.cqId;
+                    document.getElementById('qCode').value = responseData.qCode;
+                    document.getElementById('mId').value = responseData.mId;
+                    document.getElementById('smId').value = responseData.smId;
+                    document.getElementById('question_level').value = responseData.question_level;
+                    
+                    $('#edt_question').modal('show');
+                } else {
+                   // console.error("Invalid or incomplete response data.");
+                }
+            }
+        },
+        error: function(xhr, status, error) {
+           // console.error("Error. Status Code: " + xhr.status);
+           // console.error(error);
+           // document.getElementById('edt_question').style.display = 'none';
+            $('#edt_question').modal('hide');
+        }
+    });
+
+    // Assuming you want to prevent the default action of the click event
+    return false;
+  }
+
+</script>
+
+
+
+
+
+                                    
+                                        
+                                                                                
+                                  
+                                    
+                                    
+                                    
+                                
+
+
+
+                                            <!--<button type="submit" id="btn"  onclick="mainValidation()"  class="btn btn-primary"  >save</button>-->
+                                        </div> <!-- /.col -->
+
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div> <!-- / .card -->
+                    <br>
+
+                   {{-- view here--------- --}}
+
+                   <div class="container-fluid">
+                    <div class="row justify-content-center">
+
+                        <div class="col-12">
+                            <h2 class="page-title">Exams We Have</h2>
+                            <div class="row my-4">
+                                <!-- Small table -->
+                                <div class="col-md-12">
+                                    <div class="card shadow">
+                                        <div class="card-body">
+
+                                            <!-- table -->
+                                            <table class="table datatables" id="dataTable-1">
+                                                <thead>
+                                                <tr style="background-color: lightgray;">
+                                                    <th style="color: black;"><b>SL NO</b></th>
+                                                    <th></th> 
+                                                    <th style="color: black;"><b>Exam Name</b></th>
+                                                    <th style="color: black;"><b>Exam Description</b></th>
+                                                   
+                                                   
+                                                    <th style="color: black;"><b>No.Of.Question</b></th>
+                                                    
+                                                    <th style="color: black;"><b>ACTION</b></th>
+
+
+
+                                                    <!-- <th>Action</th> -->
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                @if(isset($ModelExam))
+                                                    @php $i=1 @endphp
+                                                    @foreach ($ModelExam as $item)
+                                                        <tr style="color: black;">
+
+                                                            <td width="65"><b>{{$i++}} </b>
+                                                            </td>
+                                                            <td  width="20" > @if( $item->isAvail==0)
+                                                                <b style="color: green;font-size:30px ">&#x2022;</b>
+
+                                                            @endif
+                                                            @if( $item->isAvail==2)
+                                                                <b style="color: red;font-size:30px ">&#x2022;</b>
+
+                                                            @endif
+                                                            </td>
+                                                           
+                                                            <td width="70" >{{ $item->meName }}</td>
+                                                            <td width="100" >{{ wordwrap($item->meDescription,20,"\n",TRUE) }}</td>
+                                                           
+                                                            
+                                                            <td width="70" style="text-align: inherit">{{ wordwrap($item->no_of_quest,20,"\n",TRUE) }}</td>
+                                                           
+                                                            
+                                                            <td width="65">
+                                                                <abbr style="text-decoration: none;"  title="Delete Exam"><a href="{{url('modelexamdelete_me/'.$item->meId)}}" style="text-decoration: none;" onclick="deleteItem(event, this)"><span style="color: red;font-size: 26px;"class="fa fa-trash-o"></span></a></abbr>
+                                                               &nbsp;
+                                                                @if( $item->isAvail==0)
+                                                                        <abbr style="text-decoration: none;"  title="Deactivate Exam"><a href="{{url('ModelEXAMDisable/'.$item->meId)}}" onclick="inactiveItem(event, this)" style="text-decoration: none;"><span style="color: red;"class="fe fe-24 fe-minus-circle"></span></a></abbr>
+                                                                    @endif
+                                                                    @if( $item->isAvail==2)
+                                                                        <abbr style="text-decoration: none;" title="Activate Exam"> <a href="{{url('ModelEXAMEnable/'.$item->meId)}}"  onclick="activeItem(event, this)" style="text-decoration: none;"><span style="color: green;" class="fe fe-24 fe-check-circle"></span></a></abbr>
+                                                                @endif
+                                                            </td>
+                                                        </tr>
+                                                    @endforeach
+                                                @endif
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div> <!-- simple table -->
+                            </div> <!-- end section -->
+                        </div> <!-- .col-12 -->
+                    </div> <!-- .row -->
+                </div> <!-- .container-fluid -->
+
+                   {{-- view end here---------- --}}
+
+
+                </div>
+            </div>
+        </main> <!-- main -->
+    </div>
+   
+    <script src="js/app.js"></script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-56159088-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag()
+        {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+        gtag('config', 'UA-56159088-1');
+    </script>
+
+    <!---------------FORM JAVASCRIPT VALIDATIONS----------------------->
+    <!---------------FORM JAVASCRIPT VALIDATION FOR Module Code-------------->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src='js/jquery.dataTables.min.js'></script>
+    <script src='js/dataTables.bootstrap4.min.js'></script>
+    <script>
+        $('#dataTable-1').DataTable(
+            {
+                autoWidth: true,
+                "lengthMenu": [
+                    [50, 100, 200, -1],
+                    [50, 100, 200, "All"]
+                ]
+            });
+    </script>
+    
+    <script>
+        function postValidation() {
+            var dailyexampostiveMark = document.getElementById('dailyexampostiveMark').value;
+            var format = /[!@#$%^&*()_+\-=\[\]{};':"\\|,<>\/?,A-Z,a-z]/;
+    
+            if (dailyexampostiveMark == null || dailyexampostiveMark == "") {
+                document.getElementById("dailyexampostiveMark-error").innerHTML = "This field is required.";
+                return false;
+            }
+           
+             else {
+                document.getElementById("dailyexampostiveMark-error").innerHTML = "";
+               
+            }
+        }
+    </script>
+    <script>
+        function negativeValidation() {
+            var dailyexamnegativeMark = document.getElementById('dailyexamnegativeMark').value;
+           // var format = /[!@#$%^&*()_+\-=\[\]{};':"\\|,<>\/?,A-Z,a-z]/;
+    
+            if (dailyexamnegativeMark == null || dailyexamnegativeMark == "") {
+                document.getElementById("dailyexamnegativeMark-error").innerHTML = "This field is required.";
+                return false;
+            }
+           
+            else {
+                document.getElementById("dailyexamnegativeMark-error").innerHTML = "";
+               
+            }
+        }
+    </script>
+    <script>
+        function dateValidation() {
+            var modelexamDesc = document.getElementById('modelexamDesc').value;
+           // let shouldSubmitForm = true;
+    
+            if (modelexamDesc == null || modelexamDesc == "") {
+                document.getElementById("modelexamDesc-error").innerHTML = "This field is required.";
+                // shouldSubmitForm = false;
+                // $("#btn").attr("disabled", true);
+                return false;
+            } else {
+                document.getElementById("modelexamDesc-error").innerHTML = "";
+               // $("#btn").attr("disabled", false);
+            }
+    
+           // return shouldSubmitForm;
+        }
+    </script>
+    
+    <script>
+        function nameValidation() {
+            var modelexamName = document.getElementById('modelexamName').value;
+            var format = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?,0-9]/;
+           // let shouldSubmitForm = true;
+    
+            if (modelexamName == null || modelexamName == "") {
+                document.getElementById("modelexamName-error").innerHTML = "This field is required.";
+               // shouldSubmitForm = false;
+               // $("#btn").attr("disabled", true);
+               return false;
+            }
+           
+            else {
+                document.getElementById("modelexamName-error").innerHTML = "";
+               // $("#btn").attr("disabled", false);
+            }
+    
+           // return shouldSubmitForm;
+        }
+    </script>
+ 
+
+
+
+
+
+<script>
+    function checkboxQQValidation() {
+       // var shouldSubmitForm = true;
+
+        var checkboxes = document.querySelectorAll('input[name="moduleId[]"]:checked');
+        var questionIds = document.querySelectorAll('input[name="questionId[]"]:checked');
+
+        if (checkboxes.length === 0) {
+            document.getElementById("moduleId-error").innerHTML = "Please select at least one module.";
+           // shouldSubmitForm = false;
+           return false;
+        } else {
+            document.getElementById("moduleId-error").innerHTML = "";
+        }
+
+        if (questionIds.length === 0) {
+            document.getElementById("quest__Id-error").innerHTML = "Please select at least one question.";
+           // shouldSubmitForm = false;
+           return false;
+        } else {
+            document.getElementById("quest__Id-error").innerHTML = "";
+        }
+       // return shouldSubmitForm = true;
+
+       
+    }
+</script>
+
+
+
+
+
+
+
+<script>
+    function mainValidation() {
+        var modelexamName = document.getElementById('modelexamName').value;
+        var modelexamDesc = document.getElementById('modelexamDesc').value;
+
+        var dailyexampostiveMark = document.getElementById('dailyexampostiveMark').value;
+        var dailyexamnegativeMark = document.getElementById('dailyexamnegativeMark').value;
+
+        if (modelexamName.trim() === "") {
+            document.getElementById("modelexamName-error").innerHTML = "This field is required.";
+            return false;
+        } else {
+            document.getElementById("modelexamName-error").innerHTML = "";
+        }
+
+        if (modelexamDesc.trim() === "") {
+            document.getElementById("modelexamDesc-error").innerHTML = "This field is required.";
+            return false;
+        } else {
+            document.getElementById("modelexamDesc-error").innerHTML = "";
+        }
+
+
+        if (dailyexampostiveMark == null || dailyexampostiveMark == "") {
+            document.getElementById("dailyexampostiveMark-error").innerHTML = "This field is required.";
+            return false;
+        } else {
+            document.getElementById("dailyexampostiveMark-error").innerHTML = "";
+        }
+
+        if (dailyexamnegativeMark == null || dailyexamnegativeMark == "") {
+            document.getElementById("dailyexamnegativeMark-error").innerHTML = "This field is required.";
+            return false;
+        } else {
+            document.getElementById("dailyexamnegativeMark-error").innerHTML = "";
+        }
+
+
+
+
+
+
+        var checkboxes = document.querySelectorAll('input[name="moduleId[]"]:checked');
+        var submoduleIds = document.querySelectorAll('input[name="submoduleId[]"]:checked');
+
+        if (checkboxes.length === 0) {
+            document.getElementById("moduleId-error").innerHTML = "Please select at least one module.";
+            return false;
+        } else {
+            document.getElementById("moduleId-error").innerHTML = "";
+        }
+
+        if (submoduleIds.length === 0) {
+            document.getElementById("submodule__Id-error").innerHTML = "Please select at least one submodule.";
+            return false;
+        } else {
+            document.getElementById("submodule__Id-error").innerHTML = "";
+        }
+
+        var questionIds = document.querySelectorAll('input[name="questionId[]"]:checked');
+
+        if (questionIds.length === 0) {
+            document.getElementById("quest__Id-error").innerHTML = "Please select at least one question.";
+            return false;
+        } else {
+            document.getElementById("quest__Id-error").innerHTML = "";
+        }
+
+       
+       // document.getElementById("mform").submit();
+       
+
+       
+        return true;
+    }
+</script>
+
+
+
+
+
+
+{{-- //submodule --}}
+<script>
+    function checkboxValidation() {
+        var checkboxes = document.querySelectorAll('input[name="moduleId[]"]:checked');
+        var submoduleIds = document.querySelectorAll('input[name="submoduleId[]"]:checked');
+            if (checkboxes.length === 0) {
+                document.getElementById("moduleId-error").innerHTML = "Please select at least one module.";
+                // shouldSubmitForm = false;
+                // $("#btn").attr("disabled", true);
+                return false;
+            } else {
+                if(submoduleIds.length === 0){
+                    document.getElementById("submodule__Id-error").innerHTML = "Please select at least one submodule.";
+                    // shouldSubmitForm = false;
+                    // $("#btn").attr("disabled", true);
+                    return false;
+                }else{
+                    document.getElementById("submodule__Id-error").innerHTML = "";
+                   // $("#btn").attr("disabled", false);
+                }
+                document.getElementById("moduleId-error").innerHTML = "";
+              //  $("#btn").attr("disabled", false);
+            }
+    
+            // if (shouldSubmitForm) {
+            //     $("#btn").attr("disabled", true).html("Saving..."); // Disable and change button text on form submission
+            //     $("#mform").submit();
+            // }
+    }
+</script>
+
+
+    
+    
+   
+
+
+
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.1.1/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.1.1/dist/sweetalert2.min.js"></script>
+    
+
+<script>
+    function deleteItem(event, element) {
+        event.preventDefault(); // prevent the default link behavior
+
+        // Show the SweetAlert confirmation dialog
+        Swal.fire({
+            title: 'Are you sure to delete this exam?',
+            text: 'This action will delete the model exam questions permanently.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Confirm',
+            cancelButtonText: 'Cancel',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = element.href;
+            }
+        });
+    }
+</script>
+
+
+<script>
+    function activeItem(event, element) {
+        event.preventDefault(); // prevent the default link behavior
+
+        // Show the SweetAlert confirmation dialog
+        Swal.fire({
+            title: 'Are you sure to activate this Exam?',
+            text: '',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Confirm',
+            cancelButtonText: 'Cancel',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // If the user confirms the deletion, redirect to the delete URL
+                window.location.href = element.href;
+            }
+        });
+    }
+</script>
+
+<script>
+    function inactiveItem(event, element) {
+        event.preventDefault(); // prevent the default link behavior
+
+        // Show the SweetAlert confirmation dialog
+        Swal.fire({
+            title: 'Are you sure to deactivate this Exam?',
+            text: '',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Confirm',
+            cancelButtonText: 'Cancel',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // If the user confirms the deletion, redirect to the delete URL
+                window.location.href = element.href;
+            }
+        });
+    }
+</script>
+
+@endsection

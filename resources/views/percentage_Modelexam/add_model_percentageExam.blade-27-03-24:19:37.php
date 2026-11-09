@@ -1,0 +1,962 @@
+@extends('admin/adminMaster')
+
+@section('adminpanel') 
+    <div class="wrapper">
+        <main role="main" class="main-content">
+            <div class="container-fluid">
+
+                <div class="row justify-content-center">
+                    <div class="col-12">
+
+                        <div class="row">
+                            <div class="col-6">
+                              <h2 class="page-title">Add Model Exam Percentage Wise</h2>
+                            </div>
+                            <div class="col-6 text-right">
+                                <a href="/modelexams-Form" class="btn btn-primary custom-btn-height">create MODEL EXAM</a>
+                            </div>
+                          </div>
+
+                          <style>
+                            .custom-btn-height {
+                              height: 30px;
+                            }
+                          
+                          </style>
+                          
+                          
+                              
+                          
+                          
+
+                        <form action="{{ url('addpercentModel_Exam') }}" id="mform" method="POST">
+                            @csrf
+                            <input type="hidden" id="user_id" name="user_id" value="{{ session('user_id') }}">
+                            <div class="card shadow mb-4">
+                                @if (session('success'))
+                                    <h6 class="alert alert-success" id="alert"><button type="button" class="close" data-dismiss="alert">x</button>{{ session('success') }}</h6>
+                                @endif
+                                @if (session('error'))
+                                    <h6 class="alert alert-danger" id="alert"><button type="button" class="close" data-dismiss="alert">x</button>{{ session('error') }}</h6>
+                                @endif
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group mb-3">
+                                                <label for="simpleinput"><b style="color: black;">Exam Name</b></label>
+                                                <input type="text" id="percentModelexamName" name="percentModelexamName" value="{{old('percentModelexamName')}}" onkeyup="return nameValidation()" placeholder="Enter exam name" class="form-control">
+                                                @if ($errors->has('percentModelexamName'))
+                                                    <span class="text-danger">{{ $errors->first('percentModelexamName') }}</span>
+                                                @endif
+                                                <span id="percentModelexamName-error" class="text-danger"></span>
+                                            </div>
+                                           
+                                        </div>
+                                        
+                                        <div class="col-md-6">
+                                            <div class="form-group mb-3">
+                                                <label for="simpleinput"><b style="color: black;">Exam Description</b></label>
+                                                <textarea  id="modelexamDesc" name="modelexamDesc" placeholder="Exam Descriptions" value="{{old('modelexamDesc')}}"  onkeyup="return descValidation();" rows="4" cols="50" style="flex-wrap: wrap;" class="form-control" ></textarea>
+                                                @if ($errors->has('modelexamDesc'))
+                                                    <span class="text-danger">{{ $errors->first('modelexamDesc') }}</span>
+                                                @endif
+                                                <span id="modelexamDesc-error" class="text-danger"></span>
+                                            </div>
+                                           
+                                        </div>
+                                       
+                                        
+
+                                    </div>
+
+                                    
+
+
+
+                                     {{-- // NUMBER OF QUESTION FOR THIS EXAM --}}
+
+                                     <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <div class="form-group">
+                                                <label for="percModelexamQuest"><b style="color: black;">Number Of Questions:</b></label>
+                                                <input type="text" id="percModelexamQuest" name="percModelexamQuest" value="{{ old('percModelexamQuest') }}" onkeyup="return questValidation()" placeholder="Enter No. Of Questions" class="form-control">
+                                                @if ($errors->has('percModelexamQuest'))
+                                                    <span class="text-danger">{{ $errors->first('percModelexamQuest') }}</span>
+                                                @endif
+                                                <span id="percModelexamQuest-error" class="text-danger"></span>
+                                            </div>
+                                        </div>
+                                    
+                                        &nbsp;
+                                        <div class="col-md-3 mb-1">
+                                            <div class="form-group">
+                                                <label for="percModelexampostiveMark"><b style="color: black;">Positive Mark:</b></label>
+                                                <input type="text" id="percModelexampostiveMark" name="percModelexampostiveMark" value="{{ old('percModelexampostiveMark') }}" onkeyup="return postValidation()" placeholder="Enter positive mark" class="form-control">
+                                                @if ($errors->has('percModelexampostiveMark'))
+                                                    <span class="text-danger">{{ $errors->first('percModelexampostiveMark') }}</span>
+                                                @endif
+                                                <span id="percModelexampostiveMark-error" class="text-danger"></span>
+                                            </div>
+                                        </div>
+                                    
+                                       
+                                        <div class="col-md-3 mb-1">
+                                            <div class="form-group">
+                                                <label for="percModelexamnegativeMark"><b style="color: black;">Negative Mark:</b></label>
+                                                <input type="text" id="percModelexamnegativeMark" name="percModelexamnegativeMark" value="{{ old('percModelexamnegativeMark') }}" onkeyup="return negativeValidation()" placeholder="Enter negative mark" class="form-control">
+                                                @if ($errors->has('percModelexamnegativeMark'))
+                                                    <span class="text-danger">{{ $errors->first('percModelexamnegativeMark') }}</span>
+                                                @endif
+                                                <span id="percModelexamnegativeMark-error" class="text-danger"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                    @if(isset($module))
+                                    <div class="col-md-12">
+                                        <div class="form-group mb-3">
+                                            <label for="simpleinput"><b style="color: black;">Modules</b></label>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    @php
+                                                        $halfCount = ceil(count($module) / 2);
+                                                    @endphp
+                                                    @foreach($module as $index => $item)
+                                                        @if($index < $halfCount)
+                                                            <div class="form-check">
+                                                                <input type="checkbox" id="moduleId_{{$item->mId}}" value="{{$item->mId}}" name="moduleId[]" onclick="checkboxSubmoduleValidation();checkboxValidation()" class="form-check-input">
+                                                                <label for="moduleId_{{$item->mId}}" class="form-check-label">{{$item->mName}}</label>
+                                                            </div>
+                                                        @endif
+                                                    @endforeach
+                                                    @if ($errors->has('moduleId'))
+                                                        <span class="text-danger">{{ $errors->first('moduleId') }}</span>
+                                                    @endif
+                                                    <span id="moduleId-error" class="text-danger"></span>
+                                                </div>
+                                    
+                                                <div class="col-md-6">
+                                                    @foreach($module as $index => $item)
+                                                        @if($index >= $halfCount)
+                                                            <div class="form-check">
+                                                                <input type="checkbox" id="moduleId_{{$item->mId}}" value="{{$item->mId}}" name="moduleId[]" onclick="checkboxSubmoduleValidation();checkboxValidation()" class="form-check-input">
+                                                                <label for="moduleId_{{$item->mId}}" class="form-check-label">{{$item->mName}}</label>
+                                                            </div>
+                                                        @endif
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @endif
+
+              {{-- the main div closing the submodule --}}
+                            <div id="mainsubmodulediv"style="display: none;"> 
+                                <div class="col-md-12">
+                                    <div class="form-group mb-3">
+                                            <label for="simpleinput"><b style="color: black;">Sub Modules</b></label>
+                                            <div style="font-weight: bold; text-align: right;"><input type="button" class="btn btn-danger" style="background-color: rgb(240, 14, 14);" value="Preview of Selected Questions" onclick="return previewQuestions()" >
+                                        <div class="form-group mb-6">
+                                            <div class="row">
+                                                
+                                               
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                  &nbsp;&nbsp;&nbsp;<div id="submodulesDiv1" style="display: none;">
+                                                        <!-- Display the submodules checkboxes -->
+                                                    </div>&nbsp;&nbsp;
+                                                    <div id="submodulesDiv2" style="display: none;">
+                                                        <!-- Display the submodules checkboxes -->
+                                                    </div>
+                                            </div>
+                                                    <span id="submodule__Id-error" class="text-danger"></span>                                        
+                                           
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+                            <script>
+                                function previewQuestions() {
+                                    var perExamName = document.getElementById('percentModelexamName').value;
+                                    var perDesc = document.getElementById('modelexamDesc').value;
+                                    var nofq = document.getElementById('percModelexamQuest').value;
+                                    var positive = document.getElementById('percModelexampostiveMark').value;
+                                    var negative = document.getElementById('percModelexamnegativeMark').value;
+
+                                    if (perExamName == "" || perExamName == null) {
+                                        alert('Please Enter Exam Name.');
+                                        return;
+                                    }
+
+                                    if (nofq == "" || nofq == null) {
+                                        alert('Please Enter Number Of Questions.');
+                                        return;
+                                    }
+                            
+                                    var moduleIdArray = [];
+                                    $('input[name="moduleId[]"]:checked').each(function() {
+                                        moduleIdArray.push($(this).val());
+                                    });
+                            
+                                    var submoduleIdArray = [];
+                                    var percentageArray = [];
+                            
+                                     $('input[name="submoduleId[]"]:checked').each(function() {
+                                        var submoduleId = $(this).val();
+                                        var percentage = $('#percent_' + submoduleId).val(); 
+
+                                        if (!submoduleId || !percentage) {
+                                            alert('Please select both submodule and percentage.');
+                                            return false;
+                                        }
+                            
+                                        submoduleIdArray.push(submoduleId);
+                                        percentageArray.push(percentage);
+                                    });
+                            
+                                  //  console.log('submoduleId', submoduleIdArray);
+                                  //  console.log('Percentage', percentageArray);
+                            
+                                    if (submoduleIdArray.length === 0 || percentageArray.length === 0) {
+                                        alert('Please select at least one submodule and its corresponding percentage.');
+                                        return; 
+                                    }
+                            
+                                    var myModal = document.getElementById('myModal');
+                                    if (myModal) {
+                                        myModal.style.display = 'block';
+
+                                        modalList.innerHTML = ''; 
+                                                       // console.log(addedQuestions);
+                                                        $.ajax({
+                                                            url: "{{url('/getSubmoduleIdandPercentagematchQuestion')}}",
+                                                            type: "get",
+                                                            data: {
+                                                                submoduleId: submoduleIdArray,
+                                                                percent: percentageArray,
+                                                                TotalQuestion:nofq,
+                                                                _token: '{{csrf_token()}}'
+                                                            },
+                                                            success: function(response) {
+                                                            if (response) {
+                                                               // console.log('Success response:', response);
+                                                                if (Array.isArray(response)) {
+                                                                    if (response.length > 0) {
+                                                                        response.forEach(function(item, index) {
+                                                                            var listItem = document.createElement('li');
+                                                                            listItem.textContent = (index + 1) + '. ' + item.question;
+                                                                            modalList.appendChild(listItem);
+                                                                        });
+                                                                    } else {
+                                                                        alert('There are no questions.');
+                                                                    }
+                                                                } else {
+                                                                    alert('Invalid response format from the server.');
+                                                                }
+                                                            } else {
+                                                                alert('Invalid response from the server.');
+                                                            }
+
+                                                            modalExamName.textContent = perExamName;
+                                                            modalNOFQ.textContent = nofq;
+                                                        }
+
+
+
+
+
+
+                                                           
+                                                        });
+
+
+
+
+                                    } else {
+                                      //  console.error("Modal element not found.");
+                                    }
+                                }
+                            </script>
+                            
+                            
+
+          <!--model for my model exam showing and saving-->
+            <!-- Modal HTML -->
+<div id="myModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()" style="color: rgb(126, 58, 53);  text-align: right;">&times;</span>
+     
+        <div>
+           
+                <label for="modalExamName" style="color: rgb(221, 14, 49, 0.945); font-weight: bold;">Exam Name:</label>
+                <p id="modalExamName" style="color: rgb(10, 82, 60); font-weight: bold; display: inline;"></p><br>
+                <label for="modalNOFQq" style="color: rgb(221, 14, 49, 0.945); font-weight: bold;">Number Of Questions:</label>
+                <p id="modalNOFQ" style="color: rgb(10, 82, 60); font-weight: bold; display: inline;"></p>
+          
+        </div>
+        
+    
+      
+      
+   
+      <p id="modalContent" style="color: rgba(221, 14, 49, 0.945); font-weight: bold; ">QUESTIONS</p>
+      <ul id="modalList" style="color: rgb(8, 7, 8); font-weight: bold; "></ul>
+      <div class="modal-footer">
+        <button type="button" class="btn mb-2 btn-secondary" style="text-align: left;" onclick="closeModal()">Close</button>
+        {{-- <input type="button" class="btn mb-2 btn-primary" style="text-align: left;" value="Save" onclick="confirmAndaddForm()"> --}}
+
+    </div>
+    </div>
+    
+  </div>
+
+  <script>
+    function closeModal() {
+        var modal = document.getElementById('myModal');
+        modal.style.display = 'none';
+    }
+  </script>
+
+
+
+
+  <style>
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+    }
+  
+    .modal-content {
+      background-color: #fefefe;
+      margin: 0% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 60%;
+      max-width: 600px;
+      position: relative;
+    }
+  
+    .close {
+      color: #aaa;
+      float: left;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  
+    .close:hover,
+    .close:focus {
+      color: black;
+    }
+  
+   
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+  
+    li {
+      margin-bottom: 10px;
+    }
+  </style>
+                            
+                            
+     <!--end model exam showing popup close-->
+
+               {{-- END the main div closing the submodule --}}
+                    <style>
+                       
+                    .checkbox-right {
+                        text-align: right;
+                    }
+                    .checkbox-right .form-check {
+                        text-align: left;
+                        display: inline-block;
+                        margin-right: 20px; 
+                    }
+                    .small-input {
+                     width: 90px;  /* Adjust the width as needed */
+                    }
+
+                    </style>                                    
+   <script>
+    var shouldSubmitForm;
+
+    function checkboxSubmoduleValidation() {
+        shouldSubmitForm = true;
+        clearErrorMessages();
+
+        var selectedModules = getSelectedModuleIds();
+
+        if (selectedModules.length > 0) {
+            loadSubmodules(selectedModules.slice());
+        } else {
+            hideSubmodules();
+        }
+    }
+
+    function checkboxValidation() {
+        shouldSubmitForm = true;
+        clearErrorMessages();
+
+        var checkboxes = document.querySelectorAll('input[name="moduleId[]"]:checked');
+        var submoduleCheckboxes = document.querySelectorAll('input[name="submoduleId[]"]:checked');
+
+        if (checkboxes.length === 0) {
+            displayErrorMessage("moduleId-error", "Please select at least one module.");
+            shouldSubmitForm = false;
+        }
+
+        if (submoduleCheckboxes.length === 0) {
+            displayErrorMessage("submodule__Id-error", "Please select at least one submodule.");
+            shouldSubmitForm = false;
+        } else {
+            validatePercentFields(submoduleCheckboxes);
+        }
+
+        if (shouldSubmitForm) {
+            disableButtonAndSubmitForm();
+        }
+    }
+
+    function clearErrorMessages() {
+        document.getElementById("moduleId-error").innerHTML = "";
+        document.getElementById("submodule__Id-error").innerHTML = "";
+    }
+
+    function getSelectedModuleIds() {
+        var selectedModules = [];
+        $('input[name="moduleId[]"]:checked').each(function () {
+            selectedModules.push($(this).val());
+        });
+        return selectedModules;
+    }
+
+    function loadSubmodules(moduleIds) {
+        var submoduleHTMLDiv1 = '';
+        var submoduleHTMLDiv2 = '';
+
+        var loadSubmodulesRecursive = function (moduleIds) {
+            var allSubmodules = [];
+
+            if (moduleIds.length === 0) {
+                return;
+            }
+
+            var moduleId = moduleIds.shift();
+
+            $.ajax({
+                url: "{{url('/percentagewisemodelexamexmmodulecheck')}}",
+                type: "POST",
+                data: {
+                    mId: moduleId,
+                    _token: '{{csrf_token()}}'
+                },
+                success: function (result) {
+                    if (result) {
+                        allSubmodules = allSubmodules.concat(result);
+                        console.log(allSubmodules);
+                        $.each(allSubmodules, function (key, value) {
+                            if (key % 2 === 0) {
+                                submoduleHTMLDiv1 += '<div class="form-check d-flex align-items-center">';
+                                submoduleHTMLDiv1 += '<input type="checkbox" id="submoduleId_' + value.smId + '" value="' + value.smId + '" name="submoduleId[]" class="form-check-input" onclick="return checkboxValidation();">';
+                                submoduleHTMLDiv1 += '<label for="submoduleId_' + value.smId + '" class="form-check-label">' + value.smName + '</label>';
+                                submoduleHTMLDiv1 += '<input type="number" id="percent_' + value.smId + '" name="percent[]" style="margin-left: 5px;" placeholder="percent" class="form-control small-input" onkeyup="return checkboxValidation();">';
+                                submoduleHTMLDiv1 += '</div>';
+                            } else {
+                                submoduleHTMLDiv2 += '<div class="form-check d-flex align-items-center">';
+                                submoduleHTMLDiv2 += '<input type="checkbox" id="submoduleId_' + value.smId + '" value="' + value.smId + '" name="submoduleId[]" class="form-check-input" onclick="return checkboxValidation();">';
+                                submoduleHTMLDiv2 += '<label for="submoduleId_' + value.smId + '" class="form-check-label">' + value.smName + '</label>';
+                                submoduleHTMLDiv2 += '<input type="number" id="percent_' + value.smId + '" name="percent[]" style="margin-left: 5px;" placeholder="percent" class="form-control small-input" onkeyup="return checkboxValidation();">';
+                                submoduleHTMLDiv2 += '</div>';
+                            }
+                        });
+
+                        loadSubmodulesRecursive(moduleIds);
+                    }
+                },
+                complete: function () {
+                    if (moduleIds.length === 0) {
+                        $('#submodulesDiv1').html(submoduleHTMLDiv1);
+                        $('#submodulesDiv2').html(submoduleHTMLDiv2);
+                        $('#submodulesDiv1').show();
+                        $('#submodulesDiv2').show();
+                        document.getElementById("mainsubmodulediv").style.display = 'block';
+                    }
+                }
+            });
+        };
+
+        loadSubmodulesRecursive(moduleIds);
+    }
+   
+
+    function hideSubmodules() {
+        $('#submodulesDiv1').hide();
+        $('#submodulesDiv2').hide();
+        document.getElementById("mainsubmodulediv").style.display = 'none';
+    }
+
+    function displayErrorMessage(elementId, message) {
+        document.getElementById(elementId).innerHTML = message;
+        shouldSubmitForm = false;
+    }
+
+    function validatePercentFields(submoduleCheckboxes) {
+       /// alert(submoduleCheckboxes);
+        submoduleCheckboxes.forEach(function (checkbox) {
+            var submoduleIndex = checkbox.value;
+            var percentInput = document.getElementById("percent_" + submoduleIndex);
+
+            if (percentInput.value.trim() === "") {
+                displayErrorMessage("submodule__Id-error", "Please enter a value for the percent field of selected submodule");
+                $("#btn").attr("disabled", true);
+            }
+        });
+    }
+
+    function disableButtonAndSubmitForm() {
+        $("#btn").attr("disabled", false);
+    }
+</script>
+
+
+                                    
+                                        
+                                                                                
+                                        
+
+                                    
+                                    
+                                    
+                                    
+                                
+
+
+
+                                            <button type="submit" id="btn" onclick="return mainValidation()"  class="btn btn-primary" disabled>SAVE</button>
+                                        </div> <!-- /.col -->
+
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div> <!-- / .card -->
+                    <br>
+
+                    
+
+
+                    <div class="container-fluid">
+                        <div class="row justify-content-center">
+
+                            <div class="col-12">
+                                <h2 class="page-title">We Have Model Exams Organized By Percentage</h2>
+                                <div class="row my-4">
+                                    <!-- Small table -->
+                                    <div class="col-md-12">
+                                        <div class="card shadow">
+                                            <div class="card-body">
+
+                                                <!-- table -->
+                                                <table class="table datatables" id="dataTable-1">
+                                                    <thead>
+                                                    <tr style="background-color: lightgray;">
+                                                        <th style="color: black;"><b>SL NO</b></th>
+                                                        {{-- <th></th> --}}
+                                                        <th style="color: black;"><b>Exam Name</b></th>
+                                                        <th style="color: black;"><b>Description</b></th>
+                                                       
+                                                        <th style="color: black;"><b>No.Of.Question</b></th>
+                                                        <th style="color: black;"><b>Positive Mark</b></th>
+                                                        <th style="color: black;"><b>Negative Mark</b></th>
+                                                        <th style="color: black;"><b>ACTION</b></th>
+
+
+
+                                                        <!-- <th>Action</th> -->
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    @if(isset($getPercModelexam))
+                                                        @php $i=1 @endphp
+                                                        @foreach ($getPercModelexam as $item)
+                                                            <tr style="color: black;">
+
+                                                                <td width="65"><b>{{$i++}} </b>
+                                                                </td>
+                                                               
+                                                                <td width="100">{{ $item->meName }}</td>
+                                                                <td width="80">{{ wordwrap($item->meDescription,20,"\n",TRUE) }}</td>
+                                                               
+                                                                <td width="70">{{ wordwrap($item->noOfQuestions,20,"\n",TRUE) }}</td>
+                                                                <td width="80">{{ $item->positiveMark }}</td>
+                                                                <td width="80">{{ $item->negativeMark }}</td>
+                                                                
+                                                                <td width="65">
+                                                                    <abbr style="text-decoration: none;"  title="Delete Exam"><a href="{{url('deletethePercentModel_exam/'.$item->meId)}}" style="text-decoration: none;" onclick="deleteItem(event, this)"><span style="color: red;font-size: 26px;"class="fa fa-trash-o"></span></a></abbr>
+                                                                    &nbsp;
+                                                                   
+                                                                    
+                                                                    {{-- <abbr style="text-decoration: none;"  title="view Exam Questions"><a href="{{url('view_exam_questions'.$item->meId)}}" style="text-decoration: none;" ><span style="color: rgb(9, 61, 110);font-size: 26px;"class="fa fa-eye"></span></a></abbr> --}}
+                                                                
+                                                                </td>
+                                                            </tr>
+                                                        @endforeach
+                                                    @endif
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div> <!-- simple table -->
+                                </div> <!-- end section -->
+                            </div> <!-- .col-12 -->
+                        </div> <!-- .row -->
+                    </div> <!-- .container-fluid -->
+
+
+
+
+
+
+
+                </div>
+            </div>
+        </main> <!-- main -->
+    </div>
+   
+    <script src="js/app.js"></script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-56159088-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag()
+        {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+        gtag('config', 'UA-56159088-1');
+    </script>
+
+    <!---------------FORM JAVASCRIPT VALIDATIONS----------------------->
+    <!---------------FORM JAVASCRIPT VALIDATION FOR Module Code-------------->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src='js/jquery.dataTables.min.js'></script>
+    <script src='js/dataTables.bootstrap4.min.js'></script>
+    <script>
+        $('#dataTable-1').DataTable(
+            {
+                autoWidth: true,
+                "lengthMenu": [
+                    [50, 100, 200, -1],
+                    [50, 100, 200, "All"]
+                ]
+            });
+    </script>
+   
+    
+    <script>
+        function nameValidation() {
+            var percentModelexamName = document.getElementById('percentModelexamName').value;
+            var format = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?,0-9]/;
+            let shouldSubmitForm = true;
+    
+            if (percentModelexamName == null || percentModelexamName == "") {
+                document.getElementById("percentModelexamName-error").innerHTML = "This field is required.";
+                shouldSubmitForm = false;
+                $("#btn").attr("disabled", true);
+                return false;
+            }
+            
+            else {
+                document.getElementById("percentModelexamName-error").innerHTML = "";
+                $("#btn").attr("disabled", false);
+            }
+    
+            return shouldSubmitForm;
+        }
+    </script>
+   
+
+    <script>
+        function descValidation(){
+            var modelexamDesc = document.getElementById('modelexamDesc').value;
+           
+            let shouldSubmitForm = true;
+    
+            if (modelexamDesc == null || modelexamDesc == "") {
+                document.getElementById("modelexamDesc-error").innerHTML = "This field is required.";
+                shouldSubmitForm = false;
+                $("#btn").attr("disabled", true);
+                return false;
+            }
+            
+            else {
+                document.getElementById("modelexamDesc-error").innerHTML = "";
+                $("#btn").attr("disabled", false);
+            }
+    
+            return shouldSubmitForm;
+        }
+    </script>
+
+
+
+
+
+<script>
+    function questValidation() {
+        var percModelexamQuest = document.getElementById('percModelexamQuest').value;
+        var format = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?,A-Z,a-z]/;
+        if (percModelexamQuest == null || percModelexamQuest == "") {
+            document.getElementById("percModelexamQuest-error").innerHTML = "This field is required.";
+            shouldSubmitForm = false;
+            $("#btn").attr("disabled", true);
+            return false;
+        } 
+        else if (percModelexamQuest.match(format)) {
+            document.getElementById("percModelexamQuest-error").innerHTML = "Restriction for characters and symbols.";
+            shouldSubmitForm = false;
+            $("#btn").attr("disabled", true);
+            return false;
+        }
+        
+        else {
+            document.getElementById("percModelexamQuest-error").innerHTML = "";
+            $("#btn").attr("disabled", false);
+        }
+    }
+</script>
+<script>
+    function postValidation() {
+        var percModelexampostiveMark = document.getElementById('percModelexampostiveMark').value;
+        var format = /[!@#$%^&*()_+\-=\[\]{};':"\\|,<>\/?,A-Z,a-z]/;
+
+        if (percModelexampostiveMark == null || percModelexampostiveMark == "") {
+            document.getElementById("percModelexampostiveMark-error").innerHTML = "This field is required.";
+            shouldSubmitForm = false;
+            $("#btn").attr("disabled", true);
+            return false;
+        }
+       
+         else {
+            document.getElementById("percModelexampostiveMark-error").innerHTML = "";
+            $("#btn").attr("disabled", false);
+        }
+    }
+</script>
+<script>
+    function negativeValidation() {
+        var percModelexamnegativeMark = document.getElementById('percModelexamnegativeMark').value;
+        var format = /[!@#$%^&*()_+\-=\[\]{};':"\\|,<>\/?,A-Z,a-z]/;
+
+        if (percModelexamnegativeMark == null || percModelexamnegativeMark == "") {
+            document.getElementById("percModelexamnegativeMark-error").innerHTML = "This field is required.";
+            shouldSubmitForm = false;
+            $("#btn").attr("disabled", true);
+            return false;
+        }
+       
+        else {
+            document.getElementById("percModelexamnegativeMark-error").innerHTML = "";
+            $("#btn").attr("disabled", false);
+        }
+    }
+</script>
+    
+    
+
+
+<script>
+    function mainValidation() {
+        var percentModelexamName = document.getElementById('percentModelexamName').value;
+       
+        var modelexamDesc = document.getElementById('modelexamDesc').value;
+        var percModelexamQuest = document.getElementById('percModelexamQuest').value;
+        var percModelexampostiveMark = document.getElementById('percModelexampostiveMark').value;
+        var percModelexamnegativeMark = document.getElementById('percModelexamnegativeMark').value;
+
+        let shouldSubmitForm = true;
+
+        var format = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?,0-9]/;
+        var time = /[!@#$%^&*()_+\-=\[\]{};':"\\|,<>\/?,]/;
+
+        if (percentModelexamName == null || percentModelexamName == "") {
+            document.getElementById("percentModelexamName-error").innerHTML = "This field is required.";
+            shouldSubmitForm = false;
+            $("#btn").attr("disabled", true);
+            return false;
+        } 
+      
+         else {
+            document.getElementById("percentModelexamName-error").innerHTML = "";
+        }
+
+        if (modelexamDesc == null || modelexamDesc == "") {
+            document.getElementById("modelexamDesc-error").innerHTML = "This field is required.";
+            shouldSubmitForm = false;
+            $("#btn").attr("disabled", true);
+            return false;
+        } 
+      
+         else {
+            document.getElementById("modelexamDesc-error").innerHTML = "";
+        }
+
+        
+
+       
+
+        if (percModelexamQuest == null || percModelexamQuest == "") {
+            document.getElementById("percModelexamQuest-error").innerHTML = "This field is required.";
+            shouldSubmitForm = false;
+            $("#btn").attr("disabled", true);
+            return false;
+        } else {
+            document.getElementById("percModelexamQuest-error").innerHTML = "";
+        }
+
+        if (percModelexampostiveMark == null || percModelexampostiveMark == "") {
+            document.getElementById("percModelexampostiveMark-error").innerHTML = "This field is required.";
+            shouldSubmitForm = false;
+            $("#btn").attr("disabled", true);
+            return false;
+        } else {
+            document.getElementById("percModelexampostiveMark-error").innerHTML = "";
+        }
+
+        if (percModelexamnegativeMark == null || percModelexamnegativeMark == "") {
+            document.getElementById("percModelexamnegativeMark-error").innerHTML = "This field is required.";
+            shouldSubmitForm = false;
+            $("#btn").attr("disabled", true);
+            return false;
+        } else {
+            document.getElementById("percModelexamnegativeMark-error").innerHTML = "";
+        }
+
+       
+        var checkboxes = document.querySelectorAll('input[name="moduleId[]"]:checked');
+        var submoduleIds = document.querySelectorAll('input[name="submoduleId[]"]:checked');
+            if (checkboxes.length === 0) {
+                document.getElementById("moduleId-error").innerHTML = "Please select at least one module.";
+                shouldSubmitForm = false;
+                $("#btn").attr("disabled", true);
+                return false;
+            } else {
+                if(submoduleIds.length === 0){
+                    document.getElementById("submodule__Id-error").innerHTML = "Please select at least one submodule.";
+                    shouldSubmitForm = false;
+                    $("#btn").attr("disabled", true);
+                    return false;
+                }else{
+                    document.getElementById("submodule__Id-error").innerHTML = "";
+                    $("#btn").attr("disabled", false);
+                }
+                document.getElementById("moduleId-error").innerHTML = "";
+              //  $("#btn").attr("disabled", false);
+            }
+    
+            if (shouldSubmitForm) {
+                $("#btn").attr("disabled", true).html("Saving..."); // Disable and change button text on form submission
+                $("#mform").submit();
+            }
+
+    }
+</script>
+
+
+    
+    
+    
+
+
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.1.1/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.1.1/dist/sweetalert2.min.js"></script>
+    
+    <script>
+        function activeItem(event, element) {
+            event.preventDefault(); // prevent the default link behavior
+
+            // Show the SweetAlert confirmation dialog
+            Swal.fire({
+                title: 'Are you sure to Active this exam?',
+                
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Confirm',
+                cancelButtonText: 'Cancel',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // If the user confirms the deletion, redirect to the delete URL
+                    window.location.href = element.href;
+                }
+            });
+        }
+    </script>
+
+    <script>
+        function inactiveItem(event, element) {
+            event.preventDefault(); // prevent the default link behavior
+
+            // Show the SweetAlert confirmation dialog
+            Swal.fire({
+                title: 'Are you sure to expired this exam time?',
+               
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Confirm',
+                cancelButtonText: 'Cancel',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // If the user confirms the deletion, redirect to the delete URL
+                    window.location.href = element.href;
+                }
+            });
+        }
+    </script>
+
+<script>
+    function deleteItem(event, element) {
+        event.preventDefault(); // prevent the default link behavior
+
+        // Show the SweetAlert confirmation dialog
+        Swal.fire({
+            title: 'Are you sure to delete this exam?',
+            text: 'The selected model exam questions will be deleted permanently.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Confirm',
+            cancelButtonText: 'Cancel',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = element.href;
+            }
+        });
+    }
+</script>
+
+@endsection

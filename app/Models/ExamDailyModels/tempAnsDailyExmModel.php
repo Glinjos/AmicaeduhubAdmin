@@ -1,0 +1,17 @@
+<?php
+
+namespace App\Models\ExamDailyModels;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class tempAnsDailyExmModel extends Model
+{
+    protected $table = 'temp_dailyexam_ans';
+    protected $primaryKey = 'tdaId';
+    protected $fillable = ['tdaId','tdqId','optionA','optionB',
+                            'optionC','optionD',
+                            'created_by',
+                            'created_at','updated_by','updated_at'];
+    use HasFactory;
+}
